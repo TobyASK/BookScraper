@@ -3,6 +3,7 @@ import bs4 as bs
 import requests
 import re
 
+#URL de la page d'accueil du site
 default_url = "http://books.toscrape.com/"
 
 def extract_book(url):
@@ -11,7 +12,7 @@ def extract_book(url):
         response.raise_for_status()
         soup = bs.BeautifulSoup(response.text, 'html.parser')
 
-        # Sélecteurs robustes
+        # Sélecteurs
         title_el = soup.select_one("div.product_main h1") or soup.find("h1")
         price_el = soup.select_one("p.price_color")
         avail_el = soup.select_one("p.instock.availability")  # <-- class_ correct
