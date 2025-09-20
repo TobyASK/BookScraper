@@ -37,10 +37,8 @@ Le programme va :
 
 ## Résultats
 
-Les données sont générées dans le dossier `data/` :
-
-- `data/csv/<Categorie>.csv` → les infos des livres d’une catégorie  
-- `data/images/<Categorie>/` → toutes les couvertures des livres  
+- `csv/<Categorie>.csv` → les infos des livres d’une catégorie  
+- `images/<Categorie>/` → toutes les couvertures des livres  
 
 Chaque fichier CSV contient :  
 `product_page_url, upc, title, prix (TTC/HT), dispo, description, catégorie, note, image_url, chemin image locale`
