@@ -10,8 +10,8 @@ Le script parcourt toutes les catégories, enregistre les données dans des fich
 Cloner le repo et installer les dépendances dans un environnement virtuel :
 
 ```bash
-git clone https://github.com/mon-projet/books-online-scraper.git
-cd books-online-scraper
+git clone https://github.com/TobyASK/BookScraper.git
+cd BookScraper
 
 python -m venv .venv
 source .venv/bin/activate   # sous Windows : .venv\Scripts\activate
@@ -25,7 +25,7 @@ pip install -r requirements.txt
 Lancer le script principal :
 
 ```bash
-python main.py
+python scrap.py
 ```
 
 Le programme va :
