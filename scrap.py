@@ -187,7 +187,9 @@ def extract_all_books(url = default_url):
     
 def save_books_to_csv(books, filename):
     try:
-        with open(filename, mode='w', newline='', encoding='utf-8') as file:
+        os.makedirs("csv", exist_ok=True)
+        filepath = os.path.join("csv", filename)
+        with open(filepath, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.DictWriter(file, fieldnames=[
                 'product_page_url',
                 'universal_product_code',
@@ -204,7 +206,7 @@ def save_books_to_csv(books, filename):
             writer.writeheader()
             for book in books:
                 writer.writerow(book)
-        print(f"Books data saved to {filename}")
+        print(f"Books data saved to {filepath}")
     except Exception as e:
         print(f"Error saving books to CSV: {e}")
     
