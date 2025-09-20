@@ -1,0 +1,16 @@
+# venv & caches
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# données générées par le script (à ne pas committer)
+data/
+images/
+*.csv
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db
