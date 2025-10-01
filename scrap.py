@@ -1,7 +1,7 @@
 from urllib.parse import urljoin
 import bs4 as bs
 import requests
-import re
+import re, unicodedata
 import csv
 import concurrent.futures
 import os # Pour manipuler les fichiers et répertoires
@@ -10,7 +10,7 @@ default_url = "http://books.toscrape.com/"
 
 def extract_book(url):
     try:
-        response = requests.get(url)
+        response = requests.get(url) 
         response.raise_for_status()
         soup = bs.BeautifulSoup(response.text, 'html.parser')
 
@@ -28,6 +28,10 @@ def extract_book(url):
         price_excl = soup.find('th', string='Price (excl. tax)')
         price_excl = price_excl.find_next('td').text.strip() if price_excl else ""
 
+        # Conversion directe en float (on enlève juste le "£")
+        price_incl = float(re.sub(r"[^\d.]", "", price_incl)) if price_incl else 0.0
+        price_excl = float(re.sub(r"[^\d.]", "", price_excl)) if price_excl else 0.0
+
         # Disponibilité (nombre disponible)
         avail_el = soup.select_one("p.instock.availability")
         availability_text = avail_el.get_text(strip=True) if avail_el else ""
@@ -43,8 +47,8 @@ def extract_book(url):
                 product_description = desc_p.get_text(strip=True)
 
         # Catégorie
-        breadcrumb = soup.select('ul.breadcrumb li a')
-        category = breadcrumb[-1].find_previous('a').get_text(strip=True) if len(breadcrumb) > 2 else ""
+        cat_link = soup.select_one("ul.breadcrumb li:nth-of-type(3) a")
+        category = cat_link.get_text(strip=True) if cat_link else ""
 
         # Note (review_rating)
         rating_tag = soup.find('p', class_='star-rating')
@@ -213,10 +217,29 @@ def save_books_to_csv(books, filename):
 def download_image(img_url, dest_folder, book_title):
     try:
         os.makedirs(dest_folder, exist_ok=True)
+
+        # Normalise unicode -> ASCII (enlève accents)
+        safe_title = unicodedata.normalize('NFKD', book_title).encode('ascii', 'ignore').decode()
+
+        # Remplace tout ce qui n'est pas [A-Za-z0-9 ._-] par "_"
+        safe_title = re.sub(r'[^A-Za-z0-9 ._-]+', '_', safe_title)
+
+        # Compacte espaces et nettoie bords
+        safe_title = re.sub(r'\s+', ' ', safe_title).strip().strip('.')
+
+        # Tronque pour éviter MAX_PATH pendant le téléchargement (garde large marge)
+        MAX_BASENAME = 100
+        if len(safe_title) > MAX_BASENAME:
+            safe_title = safe_title[:MAX_BASENAME].rstrip(' ._-')
+
+        # Extension depuis l’URL (fallback .jpg)
         ext = os.path.splitext(img_url)[-1]
-        safe_title = "".join(c if c.isalnum() or c in " ._-" else "_" for c in book_title)
+        if not ext or len(ext) > 5:
+            ext = ".jpg"
+
         filename = f"{safe_title}{ext}"
         filepath = os.path.join(dest_folder, filename)
+
         if not os.path.exists(filepath):
             resp = requests.get(img_url)
             resp.raise_for_status()
@@ -226,6 +249,7 @@ def download_image(img_url, dest_folder, book_title):
     except Exception as e:
         print(f"Error downloading image {img_url}: {e}")
         return ""
+
     
 def process_all_categories():
     categories = extract_categories_url()
