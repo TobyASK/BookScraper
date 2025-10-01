@@ -1,0 +1,26 @@
+Objet : Version bêta du scraper + usage ETL
+
+Bonjour Sam,
+
+J'ai terminé la version bêta du scraper pour Books to Scrape.
+Voici comment il peut être utilisé comme pipeline ETL (Extract, Transform, Load) :
+
+- Extract : le script parcourt toutes les catégories et fiches produits, et collecte les informations (URL produit, UPC, titre, prix TTC/HT, disponibilité, description, catégorie, note, URL image).
+- Transform : les prix sont convertis en valeurs numériques (floats sans devise), la catégorie est correctement récupérée depuis le breadcrumb (ex. "Poetry" au lieu de "Books"), et les noms d’images sont nettoyés/tronqués pour éviter tout problème de compatibilité.
+- Load : les données sont sauvegardées dans un fichier CSV par catégorie (dossier csv/) et les images sont téléchargées dans un dossier images/<NomCategorie>/. Le chemin local de chaque image est ajouté au CSV (colonne local_image_path).
+
+Pour exécuter le programme :
+0. Importer le projet en ZIP ou à l'aide d'une commande git : git clone https://github.com/TobyASK/BookScraper
+1. Créer et activer un environnement virtuel Python : python -m venv .venv
+source .venv/bin/activate  -> pour macOS/Linux
+.venv\Scripts\activate  -> pour Windows
+2. Installer les dépendances : pip install -r requirements.txt
+3. Lancer le script : python scrap.py
+
+Comme convenu, le repository GitHub contient le code, un fichier requirements.txt et un README.md détaillé.
+Les données extraites (CSV + images) sont fournies séparément dans un fichier ZIP.
+
+Cordialement,
+
+Anis Bekkouche
+Analyste marketing - Books Online
